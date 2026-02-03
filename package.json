@@ -1,0 +1,42 @@
+{
+  "name": "obsidian-gitlab-plugin",
+  "version": "0.0.1",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
+    "version": "node version-bump.mjs && git add manifest.json versions.json",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oliviergoulet5/obsidian-gitlab-plugin.git"
+  },
+  "keywords": [
+    "gitlab",
+    "obsidian",
+    "plugin"
+  ],
+  "author": "Olivier Goulet",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oliviergoulet5/obsidian-gitlab-plugin/issues"
+  },
+  "homepage": "https://github.com/oliviergoulet5/obsidian-gitlab-plugin#readme",
+  "description": "An Obsidian plugin to integrate GitLab embeds into your notes.",
+  "devDependencies": {
+    "@eslint/js": "9.30.1",
+    "@types/node": "^16.11.6",
+    "esbuild": "0.25.5",
+    "eslint-plugin-obsidianmd": "0.1.9",
+    "globals": "14.0.0",
+    "jiti": "2.6.1",
+    "tslib": "2.4.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "8.35.1"
+  },
+  "dependencies": {
+    "obsidian": "latest"
+  }
+}
