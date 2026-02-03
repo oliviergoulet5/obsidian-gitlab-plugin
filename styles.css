@@ -1,8 +1,36 @@
-/*
+.gitlab-embed {
+  display: block;
+  padding: var(--size-4-2) var(--size-4-2);
+  border-radius: var(--radius-m);
+  background-color: var(--background-primary-alt);
+  border: 1px solid var(--background-modifier-border);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.gitlab-embed,
+.gitlab-embed:hover,
+.gitlab-embed:active {
+  color: var(--text-normal);
+  text-decoration: none;
+}
 
-If your plugin does not need CSS, delete this file.
+.gitlab-identifier {
+  color: var(--text-faint);
+}
 
-*/
+.gitlab-heading {
+  font-size: var(--font-ui-large);
+}
+
+.gitlab-repo {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+.gitlab-date {
+  color: var(--text-faint);
+  font-size: var(--font-ui-small);
+}
+.gitlab-author {
+  color: var(--text-faint);
+  font-size: var(--font-ui-small);
+}
