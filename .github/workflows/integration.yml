@@ -26,6 +26,7 @@ jobs:
         run: |
           wget https://github.com/obsidianmd/obsidian-releases/releases/download/v1.11.5/Obsidian-1.11.5.AppImage
           chmod +x Obsidian-1.11.5.AppImage
+          echo "OBSIDIAN_PATH=$PWD/Obsidian-1.11.5.AppImage" >> $GITHUB_ENV
       # 5. Prepare a fake vault
       - name: "Setup test vault"
         run: |
