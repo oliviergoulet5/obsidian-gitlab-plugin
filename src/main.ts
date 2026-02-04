@@ -1,5 +1,6 @@
 import { App, Editor, MarkdownView, requestUrl, Modal, Notice, Plugin, addIcon } from "obsidian";
 import { DEFAULT_SETTINGS, GitLabPluginSettings, GitLabSettingTab } from "./settings";
+import { GitLabAPIClient } from "./api-client";
 
 enum GitLabResource {
   ISSUE = "issues",
@@ -10,6 +11,8 @@ type BaseEmbedOptions = {
   href: string;
   clses: string | string[];
 }
+
+const client = new GitLabAPIClient();
 
 const BASEURL = "https://gitlab.com"; // TODO: Support self-hosted
 
@@ -79,10 +82,7 @@ export default class GitLabPlugin extends Plugin {
    * @param url - The GitLab URL to the issue
    */
   private async renderIssueEmbed(element: HTMLElement, url: GitLabURL): Promise<void> {
-    console.debug(`Fetching ${BASEURL}/api/v4/projects/${url.group}%2F${url.project}/issues/${url.id}`);
-    const response = await requestUrl({ url: `${BASEURL}/api/v4/projects/${url.group}%2F${url.project}/issues/${url.id}`, method: "GET" });
-    const issue = await response.json as GitLabIssue;
-    console.debug(issue);
+    const issue = await client.getProjectIssue(url.getProjectId(), url.id);
 
     const embedElement = this.renderBaseEmbed(element, { href: url.url, clses: ["gitlab-issue"] });
 
@@ -98,10 +98,10 @@ export default class GitLabPlugin extends Plugin {
 
     const authorElement = detailsElement.createEl("div", { cls: "gitlab-author" });
     const authorAvatarElement = authorElement.createEl("img", { cls: "gitlab-author-avatar" });
-    authorAvatarElement.src = issue.author.avatar_url;
+    authorAvatarElement.src = issue.author.avatarUrl;
     authorElement.appendText(issue.author.username);
 
-    const date = new Date(issue.created_at);
+    const date = new Date(issue.createdAt);
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
     const dd = String(date.getDate()).padStart(2, '0');
@@ -134,16 +134,6 @@ const ellipsize = (str: string, count: number): string => {
   return str.slice(0, count - ellipses.length).trimEnd() + ellipses;
 }
 
-type GitLabIssue = {
-  title: string;
-  labels: string[];
-  author: {
-    username: string;
-    avatar_url: string;
-  };
-  created_at: string;
-}
-
 class GitLabURL {
   url: string;
   baseURL: string;
@@ -174,5 +164,9 @@ class GitLabURL {
     this.project = match[3] as string;
     this.resource = match[4] as GitLabResource;
     this.id = match[5] as string;
+  }
+
+  getProjectId() {
+    return `${this.group}%2f${this.project}`;
   }
 }
