@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin} from "obsidian";
+import { App, Editor, MarkdownView, requestUrl, Modal, Notice, Plugin, addIcon } from "obsidian";
 import { DEFAULT_SETTINGS, GitLabPluginSettings, GitLabSettingTab } from "./settings";
 
 enum GitLabResource {
@@ -34,10 +34,11 @@ export default class GitLabPlugin extends Plugin {
 
   private async processAnchor(anchorElement: HTMLAnchorElement): Promise<void> {
     const url = new GitLabURL(anchorElement.href);
+    const embedParentElement = anchorElement.parentElement as HTMLElement;
 
     switch (url.resource) {
       case GitLabResource.ISSUE:
-        console.debug("Issue identified");
+        await this.renderIssueEmbed(embedParentElement, url);
         break;
       case GitLabResource.MERGE_REQUEST:
         console.debug("Merge request identified");
@@ -46,6 +47,76 @@ export default class GitLabPlugin extends Plugin {
         break;
     }
   }
+
+  private async renderIssueEmbed(element: HTMLElement, url: GitLabURL): Promise<void> {
+    console.debug(`Fetching ${BASEURL}/api/v4/projects/${url.group}%2F${url.project}/issues/${url.id}`);
+    const response = await requestUrl({ url: `${BASEURL}/api/v4/projects/${url.group}%2F${url.project}/issues/${url.id}`, method: "GET" });
+    const issue = await response.json as GitLabIssue;
+    console.debug(issue);
+
+    const embedElement = element.createEl("a"); 
+    embedElement.classList.add("gitlab-embed");
+    embedElement.classList.add("gitlab-issue");
+    embedElement.setAttribute("href", url.url);
+    embedElement.setAttribute("target", "_blank");
+    embedElement.setAttribute("rel", "noopener nofollow");
+
+    const repoElement = embedElement.createEl("div", { text: `${url.group}/${url.project}` });
+    repoElement.classList.add("gitlab-repo");
+
+    const headingElement = embedElement.createEl("div", { cls: "gitlab-heading" });
+
+    const identifierElement = headingElement.createEl("span", { text: '#' + url.id + " ", cls: "gitlab-identifier" });
+    headingElement.appendText(issue.title);
+
+    const detailsElement = embedElement.createDiv({ cls: "gitlab-details" });
+
+    const authorElement = detailsElement.createEl("div", { cls: "gitlab-author" });
+    const authorAvatarElement = authorElement.createEl("img", { cls: "gitlab-author-avatar" });
+    authorAvatarElement.src = issue.author.avatar_url;
+    authorElement.appendText(issue.author.username);
+
+    const date = new Date(issue.created_at);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
+    const dd = String(date.getDate()).padStart(2, '0');
+
+    const dateElement = detailsElement.createEl("div", { text: `${yyyy}-${mm}-${dd}`, cls: "gitlab-date" });
+
+    const labelsElement = detailsElement.createEl("div", { cls: "gitlab-labels" });
+    
+    issue.labels.slice(0, 3).forEach(label => labelsElement.createEl("div", { text: ellipsize(label, 20), cls: "gitlab-label" }));
+    // TODO add +3 more text
+  }
+}
+
+/**
+ * Truncates text and appends ellipses if the character count exceeds
+ * threshold.
+ * @param str - the text to truncate
+ * @param count - the threshold
+ * @returns truncated text with ellipses or the full text if the text is
+ * smaller in length than threshold.
+ */
+const ellipsize = (str: string, count: number): string => {
+  if (str.length <= count) {
+    return str;
+  }
+
+  const ellipses = "...";
+
+  // Truncate text and append ellipses to meet the desired length.
+  return str.slice(0, count - ellipses.length).trimEnd() + ellipses;
+}
+
+type GitLabIssue = {
+  title: string;
+  labels: string[];
+  author: {
+    username: string;
+    avatar_url: string;
+  };
+  created_at: string;
 }
 
 class GitLabURL {
@@ -74,7 +145,7 @@ class GitLabURL {
     
     this.url = match[0];
     this.baseURL = match[1] as string;
-    this.group = match[2] as string;
+    this.group = (match[2] as string).slice(0, -1); // remove trailing slash
     this.project = match[3] as string;
     this.resource = match[4] as GitLabResource;
     this.id = match[5] as string;
