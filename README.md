@@ -22,12 +22,12 @@ Contributions are welcome!
 
 To develop and test the plugin locally:
 
-1. **Clone the repository**\
+1. **Clone the repository**
    ```bash
    git clone https://github.com/oliviergoulet5/obsidian-gitlab-plugin.git
    cd obsidian-gitlab-plugin
    ```
-2. **Install dependencies**\
+2. **Install dependencies**
     ```
     npm ci
     ```
