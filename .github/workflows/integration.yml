@@ -32,7 +32,7 @@ jobs:
       - name: "Setup test vault"
         run: |
           mkdir -p vault/.obsidian/plugins/obsidian-gitlab-plugin
-          cp -r ./* vault/.obsidian/plugins/obsidian-gitlab-plugin/
+          cp -r main.js styles.css manifest.json package.json vault/.obsidian/plugins/obsidian-gitlab-plugin/
       # 6. Run Obsidian with xvfb
       - name: "Run Obsidian with Xvfb"
         run: |
