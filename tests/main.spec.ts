@@ -1,5 +1,9 @@
-import { test, expect, _electron as electron } from "@playwright/test";
 import path from "path";
+import { fileURLToPath } from "url";
+import { test, expect, _electron as electron } from "@playwright/test";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const vaultPath = path.resolve(__dirname, "../../vault");
 
@@ -12,8 +16,8 @@ test("Obsidian should open", async () => {
   // Get the first window
   const window = await app.firstWindow();
 
-  // Assert the window exists and is visible
-  expect(await window.isVisible()).toBeTruthy();
+  expect(window).toBeTruthy();
+  await expect(window).toHaveTitle(/Obsidian/);
 
   // Close Obsidian
   await app.close();
