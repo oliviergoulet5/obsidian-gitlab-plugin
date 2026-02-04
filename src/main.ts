@@ -22,6 +22,7 @@ export default class GitLabPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
 
+    this.addSettingTab(new GitLabSettingTab(this.app, this));
     this.registerMarkdownPostProcessor(async (element, context) => {
       // Query all the anchor tags in the document and process them.
       const anchorElements = Array.from(element.querySelectorAll("a"));
