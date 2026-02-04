@@ -19,8 +19,10 @@ jobs:
         uses: "actions/setup-node@v3"
         with:
           node-version: 20
-      # 3. Install dependencies
-      - run: "npm install ci"
+      # 3. Install dependencies and build
+      - run: |
+          npm install ci
+          npm run build
       # 4. Install Obsidian CLI
       # TODO: This needs to be in sync with the version we're developing with
       # automatically.
