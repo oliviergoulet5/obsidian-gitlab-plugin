@@ -1,6 +1,7 @@
 .gitlab-embed {
   display: block;
   padding: var(--size-4-2) var(--size-4-2);
+  margin: var(--size-4-2) 0;
   border-radius: var(--radius-m);
   background-color: var(--background-primary-alt);
   border: 1px solid var(--background-modifier-border);
@@ -15,10 +16,13 @@
 
 .gitlab-identifier {
   color: var(--text-faint);
+  font-weight: var(--font-light);
 }
 
 .gitlab-heading {
   font-size: var(--font-ui-large);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--size-4-2);
 }
 
 .gitlab-repo {
@@ -26,11 +30,39 @@
   font-size: var(--font-ui-smaller);
 }
 
+.gitlab-details {
+  display: flex;
+  gap: var(--size-4-6);
+  align-items: center;
+}
+
 .gitlab-date {
   color: var(--text-faint);
   font-size: var(--font-ui-small);
 }
+
 .gitlab-author {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
   color: var(--text-faint);
   font-size: var(--font-ui-small);
+}
+
+.gitlab-author-avatar {
+  width: var(--size-4-6);
+  border-radius: 9999px;
+}
+
+.gitlab-labels {
+  display: flex;
+  gap: var(--size-4-2);
+}
+
+.gitlab-label {
+  border-radius: 9999px;
+  padding: var(--size-4-1) var(--size-4-2);
+  background-color: #444;
+  color: white;
+  font-size: var(--font-smallest);
 }
