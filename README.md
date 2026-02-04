@@ -22,21 +22,22 @@ Contributions are welcome!
 
 To develop and test the plugin locally:
 
-1. **Clone the repository**  
+1. **Clone the repository**\
    ```bash
    git clone https://github.com/oliviergoulet5/obsidian-gitlab-plugin.git
    cd obsidian-gitlab-plugin
    ```
-2. **Install dependencies**
+2. **Install dependencies**\
     ```
     npm ci
     ```
-3. **Make changes**
-4. **Build the plugin**
+3. **Make changes**\
+    Write your feature or bug fix.
+4. **Build the plugin**\
     ```
     npm run build
     ```
-5. **Link to your Obsidian vault**
+5. **Link to your Obsidian vault**\
     Copy the `main.js`, `manifest.json`, and `styles.css` (if present) to your
     vault’s plugin folder:
     ```
@@ -45,6 +46,6 @@ To develop and test the plugin locally:
 
     Alternatively, you can make this automatic by either cloning into the
     plugins directory, or by creating a symlink. This should be more convenient.
-6. **Toggle to enable the plugin**
+6. **Toggle to enable the plugin**\
     Open `Obsidian` →  `Settings` →  `Community Plugins` →  `Enable Obsidian GitLab Embeds`.
 
