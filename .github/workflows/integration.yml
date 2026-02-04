@@ -20,7 +20,8 @@ jobs:
         with:
           node-version: 20
       # 3. Install dependencies and build
-      - run: |
+      - name: "Install plugin dependencies and build"
+        run: |
           npm install ci
           npm run build
       # 4. Install Obsidian CLI
