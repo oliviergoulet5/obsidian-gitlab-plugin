@@ -6,6 +6,11 @@ enum GitLabResource {
   MERGE_REQUEST = "merge_request",
 }
 
+type BaseEmbedOptions = {
+  href: string;
+  clses: string | string[];
+}
+
 const BASEURL = "https://gitlab.com"; // TODO: Support self-hosted
 
 export default class GitLabPlugin extends Plugin {
@@ -48,18 +53,38 @@ export default class GitLabPlugin extends Plugin {
     }
   }
 
+  /**
+   * Renders the base of an embed. All embeds are built upon this.
+   * @param container - The parent element
+   * @param options - Options
+   * @returns The base embed.
+   */
+  private renderBaseEmbed(container: HTMLElement, options: BaseEmbedOptions): HTMLElement {
+    const embedElement = container.createEl("a"); 
+    embedElement.classList.add("gitlab-embed");
+
+    embedElement.setAttribute("href", options.href);
+    embedElement.setAttribute("target", "_blank");
+    embedElement.setAttribute("rel", "noopener nofollow");
+    
+    embedElement.addClass("gitlab-embed");
+    embedElement.addClasses(Array.isArray(options.clses) ? options.clses : [options.clses]);
+
+    return embedElement;
+  }
+
+  /**
+   * Renders an issue embed.
+   * @param element - The parent element
+   * @param url - The GitLab URL to the issue
+   */
   private async renderIssueEmbed(element: HTMLElement, url: GitLabURL): Promise<void> {
     console.debug(`Fetching ${BASEURL}/api/v4/projects/${url.group}%2F${url.project}/issues/${url.id}`);
     const response = await requestUrl({ url: `${BASEURL}/api/v4/projects/${url.group}%2F${url.project}/issues/${url.id}`, method: "GET" });
     const issue = await response.json as GitLabIssue;
     console.debug(issue);
 
-    const embedElement = element.createEl("a"); 
-    embedElement.classList.add("gitlab-embed");
-    embedElement.classList.add("gitlab-issue");
-    embedElement.setAttribute("href", url.url);
-    embedElement.setAttribute("target", "_blank");
-    embedElement.setAttribute("rel", "noopener nofollow");
+    const embedElement = this.renderBaseEmbed(element, { href: url.url, clses: ["gitlab-issue"] });
 
     const repoElement = embedElement.createEl("div", { text: `${url.group}/${url.project}` });
     repoElement.classList.add("gitlab-repo");
