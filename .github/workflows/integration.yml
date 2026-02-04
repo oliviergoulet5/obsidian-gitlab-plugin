@@ -1,0 +1,45 @@
+name: "Integration Tests"
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+jobs:
+  test:
+    runs-on: "ubuntu-latest"
+    services:
+      xvfb:
+        image: "selenium/standalone-chrome"
+        options: >-
+          --shm-size 2g
+    steps:
+      # 1. Checkout code
+      - uses: "actions/checkout@v3"
+      # 2. Setup Node.js
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v3"
+        with:
+          node-version: 20
+      # 3. Install dependencies
+      - run: "npm install ci"
+      # 4. Install Obsidian CLI
+      # TODO: This needs to be in sync with the version we're developing with
+      # automatically.
+      - name: "Install Obsidian"
+        run: |
+          wget https://github.com/obsidianmd/obsidian-releases/releases/download/v1.11.5/Obsidian-1.11.5.AppImage
+          chmod +x Obsidian-1.11.5.AppImage
+      # 5. Prepare a fake vault
+      - name: "Setup test vault"
+        run: |
+          mkdir -p vault/.obsidian/plugins/obsidian-gitlab-plugin
+          cp -r ./* vault/.obsidian/plugins/obsidian-gitlab-plugin/
+      # 6. Run Obsidian with xvfb
+      - name: "Run Obsidian with Xvfb"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgtk-3-0 libx11-xcb1 libnss3 libasound2 libxss1
+          Xvfb :99 -screen 0 1024x768x24 &
+          export DISPLAY=:99
+      # 7. Run integration tests
+      - name: "Run integration tests"
+        run: "npm run test"
