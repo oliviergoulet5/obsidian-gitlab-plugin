@@ -8,7 +8,7 @@ export class GitLabAPIClient {
   private baseURL: string;
 
   constructor(options: GitLabAPIClientOptions = {}) {
-    this.baseURL = options.baseURL ?? "https://gitlab.com/api";
+    this.baseURL = options.baseURL + "/api";
   }
   
   /**
@@ -20,13 +20,13 @@ export class GitLabAPIClient {
    * @throws
    */
   async getProjectIssue(id: string, issueIid: string) {
-    console.debug(`${this.baseURL}/v4/projects/${id}/issues/${issueIid}`);
+    const url = `${this.baseURL}/v4/projects/${id}/issues/${issueIid}`;
     const response = await requestUrl({ 
-      url: `${this.baseURL}/v4/projects/${id}/issues/${issueIid}`, 
+      url,
       method: "GET" 
     });
 
-    const data = await response.json as _APIIssue;
+    let data = await response.json as _APIIssue;
     
     return issueMapper(data);
   }
@@ -59,9 +59,10 @@ type _APIIssue = {
   upvotes: number;
   downvotes: number;
   confidential: boolean;
+  web_url: string;
 }
 
-type Issue = {
+export type Issue = {
   id: number;
   iid: number;
   projectId: number;
@@ -88,6 +89,7 @@ type Issue = {
   upvotes: number;
   downvotes: number;
   confidential: boolean;
+  webUrl: string;
 }
 
 function issueMapper(data: _APIIssue): Issue {
@@ -118,5 +120,6 @@ function issueMapper(data: _APIIssue): Issue {
     upvotes: data.upvotes,
     downvotes: data.downvotes,
     confidential: data.confidential,
+    webUrl: data.web_url,
   }
 }

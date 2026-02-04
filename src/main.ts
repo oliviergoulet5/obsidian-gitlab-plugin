@@ -1,6 +1,6 @@
 import { App, Editor, MarkdownView, requestUrl, Modal, Notice, Plugin, addIcon } from "obsidian";
 import { DEFAULT_SETTINGS, GitLabPluginSettings, GitLabSettingTab } from "./settings";
-import { GitLabAPIClient } from "./api-client";
+import { GitLabAPIClient, Issue } from "./api-client";
 
 enum GitLabResource {
   ISSUE = "issues",
@@ -12,17 +12,23 @@ type BaseEmbedOptions = {
   clses: string | string[];
 }
 
-const client = new GitLabAPIClient();
-
-const BASEURL = "https://gitlab.com"; // TODO: Support self-hosted
+// Key-value pairs where the keys are baseURLs and the value is the API client
+// for that URL. This ensures that client lookup can be done quickly per URL
+// encountered.
+type GitLabAPIClientRecord = Record<string, GitLabAPIClient>;
 
 export default class GitLabPlugin extends Plugin {
   settings: GitLabPluginSettings;
+  clients: GitLabAPIClientRecord = {};
 
   async onload() {
     await this.loadSettings();
-
     this.addSettingTab(new GitLabSettingTab(this.app, this));
+    
+    // Initialize GitLab clients based on user-configured list of GitLab
+    // instances.
+    this.settings.baseUrls.forEach(baseURL => this.clients[baseURL] = new GitLabAPIClient({ baseURL }));
+
     this.registerMarkdownPostProcessor(async (element, context) => {
       // Query all the anchor tags in the document and process them.
       const anchorElements = Array.from(element.querySelectorAll("a"));
@@ -42,19 +48,37 @@ export default class GitLabPlugin extends Plugin {
   }
 
   private async processAnchor(anchorElement: HTMLAnchorElement): Promise<void> {
-    const url = new GitLabURL(anchorElement.href);
+    const url = new GitLabURL(anchorElement.href, this.settings.baseUrls);
     const embedParentElement = anchorElement.parentElement as HTMLElement;
 
+    const client = this.getRelevantAPIClient(url.baseURL);
+    if (!client) return;
+
     switch (url.resource) {
-      case GitLabResource.ISSUE:
-        await this.renderIssueEmbed(embedParentElement, url);
+      case GitLabResource.ISSUE: {
+        const issue = await client.getProjectIssue(url.getProjectId(), url.id);
+        await this.renderIssueEmbed(embedParentElement, issue);
         break;
-      case GitLabResource.MERGE_REQUEST:
-        console.debug("Merge request identified");
+      }
+      case GitLabResource.MERGE_REQUEST: {
         break;
-      default:
+      }
+      default: {
         break;
+      }
     }
+  }
+
+  /**
+   * Retrieve the API client relevant to the given base URL.
+   *
+   * This assumes that a valid baseURL has been given. Otherwise, it will error.
+   *
+   * @param baseURL The base URL of a GitLab instance
+   * @throws
+   */
+  private getRelevantAPIClient(baseURL: string) {
+    return this.clients[baseURL];
   }
 
   /**
@@ -82,17 +106,16 @@ export default class GitLabPlugin extends Plugin {
    * @param element - The parent element
    * @param url - The GitLab URL to the issue
    */
-  private async renderIssueEmbed(element: HTMLElement, url: GitLabURL): Promise<void> {
-    const issue = await client.getProjectIssue(url.getProjectId(), url.id);
+  private async renderIssueEmbed(element: HTMLElement, issue: Issue): Promise<void> {
+    const embedElement = this.renderBaseEmbed(element, { href: issue.webUrl, clses: ["gitlab-issue"] });
 
-    const embedElement = this.renderBaseEmbed(element, { href: url.url, clses: ["gitlab-issue"] });
-
-    const repoElement = embedElement.createEl("div", { text: `${url.group}/${url.project}` });
+    const { group, project } = new GitLabURL(issue.webUrl, this.settings.baseUrls);
+    const repoElement = embedElement.createEl("div", { text: `${group}/${project}` });
     repoElement.classList.add("gitlab-repo");
 
     const headingElement = embedElement.createEl("div", { cls: "gitlab-heading" });
 
-    const identifierElement = headingElement.createEl("span", { text: '#' + url.id + " ", cls: "gitlab-identifier" });
+    const identifierElement = headingElement.createEl("span", { text: '#' + issue.iid + " ", cls: "gitlab-identifier" });
     headingElement.appendText(issue.title);
 
     const detailsElement = embedElement.createDiv({ cls: "gitlab-details" });
@@ -143,28 +166,24 @@ class GitLabURL {
   resource: GitLabResource;
   id: string;
 
-  constructor(url: string) {
-    // This pattern breaks down a GitLab URL into the following parts:
-    // 1. BaseURL
-    // 2. Group
-    // 3. Project
-    // 4. Resource (e.g. issues, merge_requests)
-    // 5. ID (e.g. 1, 2, 40)
-    const pattern = new RegExp(
-      /(https?:\/\/[^/]+)\/((?:[^/]+\/)*)([^/]+)\/-\/([^/]+)\/(\d+)/gm
-    );
-    const match = pattern.exec(url);
+  constructor(url: string, validBaseURLs: string[]) {
+    const baseURL = validBaseURLs.find(b => url.startsWith(b));
+    if (!baseURL) throw new TypeError("URL does not match any configured GitLab instances: " + url);
+
+    const pathToMatch = url.substring(baseURL.length);
+
+    const pattern = /^\/(.+?)\/([^/]+)\/-\/([^/]+)\/(\d+)/;
+    const match = pattern.exec(pathToMatch);
     
     if (match === null) throw new TypeError(`Invalid GitLab URL: ${url}`);
-    console.debug(match);
-    if (match.length !== 6) throw new TypeError(`Wrong format GitLab URL: ${url}`);
+    if (match.length !== 5) throw new TypeError(`Wrong format GitLab URL: ${url}`);
     
-    this.url = match[0];
-    this.baseURL = match[1] as string;
-    this.group = (match[2] as string).slice(0, -1); // remove trailing slash
-    this.project = match[3] as string;
-    this.resource = match[4] as GitLabResource;
-    this.id = match[5] as string;
+    this.url = url;
+    this.baseURL = baseURL;
+    this.group = match[1] as string;
+    this.project = match[2] as string;
+    this.resource = match[3] as GitLabResource;
+    this.id = match[4] as string;
   }
 
   getProjectId() {

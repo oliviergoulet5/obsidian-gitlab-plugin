@@ -2,12 +2,10 @@ import { App, PluginSettingTab, Setting } from "obsidian";
 import GitLabPlugin from "./main";
 
 export interface GitLabPluginSettings {
-  baseUrl: string;
   baseUrls: string[];
 }
 
 export const DEFAULT_SETTINGS: GitLabPluginSettings = {
-  baseUrl: "https://gitlab.com",
   baseUrls: ["https://gitlab.com"],
 }
 
