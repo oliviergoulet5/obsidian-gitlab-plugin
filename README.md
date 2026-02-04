@@ -33,7 +33,7 @@ To develop and test the plugin locally:
     ```
 3. **Make changes**\
     Write your feature or bug fix.
-4. **Build the plugin**\
+4. **Build the plugin**
     ```
     npm run build
     ```
