@@ -40,7 +40,15 @@ jobs:
       - name: "Run Obsidian with Xvfb"
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb libgtk-3-0 libx11-xcb1 libnss3 libasound2 libxss1
+          sudo apt-get install -y \
+            xvfb \
+            libgtk-3-0 \
+            libx11-xcb1 \
+            libnss3 \
+            libasound2-data \
+            libasound2-plugins \
+            libxss1 \
+            libgbm1
           Xvfb :99 -screen 0 1024x768x24 &
           export DISPLAY=:99
       # 7. Run integration tests
