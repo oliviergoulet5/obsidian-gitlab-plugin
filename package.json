@@ -7,7 +7,8 @@
     "dev": "node esbuild.config.mjs",
     "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
     "version": "node version-bump.mjs && git add manifest.json versions.json",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,9 @@
   "description": "An Obsidian plugin to integrate GitLab embeds into your notes.",
   "devDependencies": {
     "@eslint/js": "9.30.1",
-    "@types/node": "^16.11.6",
+    "@playwright/test": "^1.58.1",
+    "@types/node": "^20.0.0",
+    "electron": "^40.1.0",
     "esbuild": "0.25.5",
     "eslint-plugin-obsidianmd": "0.1.9",
     "globals": "14.0.0",
