@@ -48,7 +48,14 @@ export default class GitLabPlugin extends Plugin {
   }
 
   private async processAnchor(anchorElement: HTMLAnchorElement): Promise<void> {
-    const url = new GitLabURL(anchorElement.href, this.settings.baseUrls);
+    let url: GitLabURL;
+    try {
+      url = new GitLabURL(anchorElement.href, this.settings.baseUrls);
+    } catch {
+      // This anchor does not need to be processed further since it is not a
+      // GitLab URL.
+      return;
+    }
     const embedParentElement = anchorElement.parentElement as HTMLElement;
 
     const client = this.getRelevantAPIClient(url.baseURL);
