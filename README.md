@@ -4,6 +4,9 @@ An Obsidian plugin that embeds GitLab resources (issues, merge requests,
 projects, and more) directly into your notes for quick reference and better
 context.
 
+<img width="717" height="115" alt="Screenshot from 2026-02-04 23-50-52" src="https://github.com/user-attachments/assets/a20db904-222b-4fc8-af49-13fa8cc57348" />
+
+
 ## Getting Started
 
 1. Install the **Obsidian GitLab Embeds** plugin.
