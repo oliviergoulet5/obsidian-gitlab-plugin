@@ -1,10 +1,10 @@
 {
-  "id": "obsidian-gitlab-plugin",
-  "name": "GitLab Embeds",
-  "version": "0.0.1",
-  "minAppVersion": "1.5.0",
-  "description": "Integrate GitLab embeds into Obsidian.",
-  "author": "Olivier Goulet",
-  "authorUrl": "https://github.com/oliviergoulet5",
-  "isDesktopOnly": false
+	"id": "obsidian-gitlab-plugin",
+	"name": "GitLab Embeds",
+	"version": "1.0.0",
+	"minAppVersion": "1.5.0",
+	"description": "Integrate GitLab embeds into Obsidian.",
+	"author": "Olivier Goulet",
+	"authorUrl": "https://github.com/oliviergoulet5",
+	"isDesktopOnly": false
 }
