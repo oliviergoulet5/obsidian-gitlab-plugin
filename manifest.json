@@ -1,7 +1,7 @@
 {
 	"id": "gitlab-embeds",
 	"name": "GitLab Embeds",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "1.5.0",
 	"description": "Integrate GitLab embeds into your notes.",
 	"author": "Olivier Goulet",
