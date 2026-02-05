@@ -26,7 +26,16 @@ export class GitLabSettingTab extends PluginSettingTab {
       .setName("GitLab instances")
       .setDesc("Enter the base urls to the GitLab instances you use. Separate each base urls in a new line.")
       .addTextArea(component => {
-        component.setPlaceholder(this.plugin.settings.baseUrls.join("\n"))
+        component
+          .setValue(this.plugin.settings.baseUrls.join("\n"))
+          .setPlaceholder(this.plugin.settings.baseUrls.join("\n"))
+          .onChange(async (value) => {
+            this.plugin.settings.baseUrls = value
+              .split("\n")
+              .map(url => url.trim())
+              .filter(url => url.length > 0);
+            await this.plugin.saveSettings();
+          });
       });
 	}
 }
