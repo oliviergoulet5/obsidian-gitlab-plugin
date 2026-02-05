@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-gitlab-embeds",
+  "name": "obsidian-gitlab-plugin",
   "version": "1.0.0",
   "main": "main.js",
   "type": "module",
