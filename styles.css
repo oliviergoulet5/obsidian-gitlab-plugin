@@ -1,4 +1,5 @@
 .gitlab-embed {
+  container-type: inline-size;
   display: block;
   padding: var(--size-4-2) var(--size-4-2);
   margin: var(--size-4-2) 0;
@@ -34,6 +35,7 @@
   display: flex;
   gap: var(--size-4-6);
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .gitlab-date {
@@ -55,11 +57,21 @@
 }
 
 .gitlab-labels {
-  display: flex;
-  gap: var(--size-4-2);
+  display: none;
+}
+
+/* Context: .gitlab-embed */
+@container (min-width: 360px) {
+  .gitlab-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-4-2);
+    align-items: center;
+  }
 }
 
 .gitlab-label {
+  text-wrap: nowrap;
   border-radius: 9999px;
   padding: var(--size-4-1) var(--size-4-2);
   background-color: #444;
