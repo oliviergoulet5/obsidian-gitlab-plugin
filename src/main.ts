@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, requestUrl, Modal, Notice, Plugin, addIcon } from "obsidian";
+import { Plugin } from "obsidian";
 import { DEFAULT_SETTINGS, GitLabPluginSettings, GitLabSettingTab } from "./settings";
 import { GitLabAPIClient, Issue } from "./api-client";
 
@@ -64,7 +64,7 @@ export default class GitLabPlugin extends Plugin {
     switch (url.resource) {
       case GitLabResource.ISSUE: {
         const issue = await client.getProjectIssue(url.getProjectId(), url.id);
-        await this.renderIssueEmbed(embedParentElement, issue);
+        this.renderIssueEmbed(embedParentElement, issue);
         break;
       }
       case GitLabResource.MERGE_REQUEST: {
@@ -113,7 +113,7 @@ export default class GitLabPlugin extends Plugin {
    * @param element - The parent element
    * @param url - The GitLab URL to the issue
    */
-  private async renderIssueEmbed(element: HTMLElement, issue: Issue): Promise<void> {
+  private renderIssueEmbed(element: HTMLElement, issue: Issue): void {
     const embedElement = this.renderBaseEmbed(element, { href: issue.webUrl, clses: ["gitlab-issue"] });
 
     const { group, project } = new GitLabURL(issue.webUrl, this.settings.baseUrls);
@@ -122,7 +122,8 @@ export default class GitLabPlugin extends Plugin {
 
     const headingElement = embedElement.createEl("div", { cls: "gitlab-heading" });
 
-    const identifierElement = headingElement.createEl("span", { text: '#' + issue.iid + " ", cls: "gitlab-identifier" });
+    // Identifier element
+    headingElement.createEl("span", { text: '#' + issue.iid + " ", cls: "gitlab-identifier" });
     headingElement.appendText(issue.title);
 
     const detailsElement = embedElement.createDiv({ cls: "gitlab-details" });
@@ -137,12 +138,12 @@ export default class GitLabPlugin extends Plugin {
     const mm = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
     const dd = String(date.getDate()).padStart(2, '0');
 
-    const dateElement = detailsElement.createEl("div", { text: `${yyyy}-${mm}-${dd}`, cls: "gitlab-date" });
+    // Date element
+    detailsElement.createEl("div", { text: `${yyyy}-${mm}-${dd}`, cls: "gitlab-date" });
 
     const labelsElement = detailsElement.createEl("div", { cls: "gitlab-labels" });
     
     issue.labels.slice(0, 3).forEach(label => labelsElement.createEl("div", { text: ellipsize(label, 20), cls: "gitlab-label" }));
-    // TODO add +3 more text
   }
 }
 
