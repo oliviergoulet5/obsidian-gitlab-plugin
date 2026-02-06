@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, requestUrl, Modal, Notice, Plugin, addIcon } from "obsidian";
+import { Plugin } from "obsidian";
 import { DEFAULT_SETTINGS, GitLabPluginSettings, GitLabSettingTab } from "./settings";
 import { GitLabAPIClient, Issue } from "./api-client";
 
@@ -122,7 +122,8 @@ export default class GitLabPlugin extends Plugin {
 
     const headingElement = embedElement.createEl("div", { cls: "gitlab-heading" });
 
-    const identifierElement = headingElement.createEl("span", { text: '#' + issue.iid + " ", cls: "gitlab-identifier" });
+    // Identifier element
+    headingElement.createEl("span", { text: '#' + issue.iid + " ", cls: "gitlab-identifier" });
     headingElement.appendText(issue.title);
 
     const detailsElement = embedElement.createDiv({ cls: "gitlab-details" });
@@ -137,7 +138,8 @@ export default class GitLabPlugin extends Plugin {
     const mm = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
     const dd = String(date.getDate()).padStart(2, '0');
 
-    const dateElement = detailsElement.createEl("div", { text: `${yyyy}-${mm}-${dd}`, cls: "gitlab-date" });
+    // Date element
+    detailsElement.createEl("div", { text: `${yyyy}-${mm}-${dd}`, cls: "gitlab-date" });
 
     const labelsElement = detailsElement.createEl("div", { cls: "gitlab-labels" });
     
