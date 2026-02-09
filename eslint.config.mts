@@ -1,7 +1,8 @@
-import tseslint from 'typescript-eslint';
+import tseslint from "typescript-eslint";
 import obsidianmd from "eslint-plugin-obsidianmd";
 import globals from "globals";
 import { globalIgnores } from "eslint/config";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default tseslint.config(
   {
@@ -11,13 +12,10 @@ export default tseslint.config(
       },
       parserOptions: {
         projectService: {
-          allowDefaultProject: [
-            'eslint.config.js',
-            'manifest.json'
-          ]
+          allowDefaultProject: ["eslint.config.js", "manifest.json"],
         },
         tsconfigRootDir: import.meta.dirname,
-        extraFileExtensions: ['.json']
+        extraFileExtensions: [".json"],
       },
     },
   },
@@ -31,4 +29,5 @@ export default tseslint.config(
     "versions.json",
     "main.js",
   ]),
+  eslintPluginPrettierRecommended,
 );
