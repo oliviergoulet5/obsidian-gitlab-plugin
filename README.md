@@ -6,12 +6,16 @@ context.
 
 <img width="717" height="115" alt="Screenshot from 2026-02-04 23-50-52" src="https://github.com/user-attachments/assets/a20db904-222b-4fc8-af49-13fa8cc57348" />
 
-
 ## Getting Started
 
 1. Install the **Obsidian GitLab Embeds** plugin.
 2. Paste a supported GitLab URL (issue, merge request, repository, etc.) into a note.
 3. Switch to preview mode to see the embed rendered.
+
+## Disclaimer
+
+This plugin makes network requests to configured GitLab instances (e.g.
+gitlab.com or self-hosted servers) in order to fetch and display embeds.
 
 ## Contribute
 
