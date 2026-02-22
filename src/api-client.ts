@@ -1,16 +1,54 @@
-import { requestUrl } from "obsidian";
+import { Plugin, requestUrl } from "obsidian";
+import AuthService from "./auth-service";
 
 type GitLabAPIClientOptions = {
-  baseURL?: string;
-}
+  baseURL: string;
+  plugin: Plugin;
+  clientId?: string;
+};
 
 export class GitLabAPIClient {
   private baseURL: string;
+  private authService: AuthService | null = null;
 
-  constructor(options: GitLabAPIClientOptions = {}) {
+  constructor(options: GitLabAPIClientOptions) {
     this.baseURL = options.baseURL + "/api";
+
+    console.debug(options);
+    if (options.clientId) {
+      this.authService = new AuthService(
+        options.plugin,
+        options.baseURL,
+        options.clientId,
+      );
+    }
   }
-  
+
+  async authorize() {
+    if (!this.authService) {
+      throw new Error("clientId not configured");
+    }
+    const url = await this.authService.getAuthorizeUrl();
+    window.location.href = url;
+  }
+
+  async handleCallback(code: string, state: string): Promise<void> {
+    if (!this.authService) {
+      throw new Error("clientId not configured");
+    }
+    await this.authService.handleCallback(code, state);
+  }
+
+  async getValidToken(): Promise<string | null> {
+    if (!this.authService) return null;
+    return await this.authService.getValidToken();
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    if (!this.authService) return false;
+    return await this.authService.isAuthenticated();
+  }
+
   /**
    * Get a single project issue.
    *
@@ -21,13 +59,13 @@ export class GitLabAPIClient {
    */
   async getProjectIssue(id: string, issueIid: string) {
     const url = `${this.baseURL}/v4/projects/${id}/issues/${issueIid}`;
-    const response = await requestUrl({ 
+    const response = await requestUrl({
       url,
-      method: "GET" 
+      method: "GET",
     });
 
-    let data = await response.json as _APIIssue;
-    
+    let data = (await response.json) as _APIIssue;
+
     return issueMapper(data);
   }
 }
@@ -53,14 +91,14 @@ type _APIIssue = {
     locked: boolean;
     avatar_url: string;
     web_url: string;
-  }
+  };
   type: string;
   user_notes_count: number;
   upvotes: number;
   downvotes: number;
   confidential: boolean;
   web_url: string;
-}
+};
 
 export type Issue = {
   id: number;
@@ -83,14 +121,14 @@ export type Issue = {
     locked: boolean;
     avatarUrl: string;
     webUrl: string;
-  }
+  };
   type: string;
   userNotesCount: number;
   upvotes: number;
   downvotes: number;
   confidential: boolean;
   webUrl: string;
-}
+};
 
 function issueMapper(data: _APIIssue): Issue {
   return {
@@ -121,5 +159,5 @@ function issueMapper(data: _APIIssue): Issue {
     downvotes: data.downvotes,
     confidential: data.confidential,
     webUrl: data.web_url,
-  }
+  };
 }
