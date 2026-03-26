@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Notice, Plugin } from "obsidian";
 import {
   DEFAULT_SETTINGS,
   GitLabPluginSettings,
@@ -41,6 +41,7 @@ export default class GitLabPlugin extends Plugin {
       const client = baseUrl ? this.clients[baseUrl] : undefined;
       if (client && code && state) {
         await client.handleCallback(code, state);
+        new Notice("Successfully connected to GitLab!", 5000);
       }
     });
 
