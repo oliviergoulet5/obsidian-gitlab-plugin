@@ -4,6 +4,7 @@ import GitLabPlugin from "./main";
 export interface GitLabInstance {
   baseUrl: string;
   clientId?: string;
+  clientSecret?: string;
 }
 
 export interface GitLabPluginSettings {
@@ -44,7 +45,7 @@ export class GitLabSettingTab extends PluginSettingTab {
               .map((url) => url.trim())
               .filter((url) => url.length > 0);
 
-            // Preserve existing clientIds for URLs that still exist
+            // Preserve existing clientIds and clientSecrets for URLs that still exist
             this.plugin.settings.instances = urls.map((url) => {
               const existing = this.plugin.settings.instances.find(
                 (i) => i.baseUrl === url,
@@ -52,6 +53,7 @@ export class GitLabSettingTab extends PluginSettingTab {
               return {
                 baseUrl: url,
                 clientId: existing?.clientId,
+                clientSecret: existing?.clientSecret,
               };
             });
             await this.plugin.saveSettings();
@@ -77,6 +79,43 @@ export class GitLabSettingTab extends PluginSettingTab {
             .setPlaceholder("Optional - leave empty for public access")
             .onChange(async (value) => {
               instance.clientId = value.trim() || undefined;
+              await this.plugin.saveSettings();
+              this.plugin.reloadClients();
+            });
+        });
+
+      new Setting(containerEl)
+        .setName(`Advanced`)
+        .setDesc("Show additional OAuth settings")
+        .addToggle((component) => {
+          component.setValue(false);
+          component.onChange((showAdvanced) => {
+            const advancedContainer = containerEl.querySelector(
+              `.advanced-settings-${instance.baseUrl.replace(/[^a-zA-Z0-9]/g, "-")}`,
+            );
+            if (advancedContainer instanceof HTMLElement) {
+              advancedContainer.style.display = showAdvanced ? "block" : "none";
+            }
+          });
+        });
+
+      const advancedDiv = containerEl.createEl("div", {
+        cls: `advanced-settings-${instance.baseUrl.replace(/[^a-zA-Z0-9]/g, "-")}`,
+        attr: { style: "display: none; padding-left: 20px;" },
+      });
+
+      new Setting(advancedDiv)
+        .setName("Client secret")
+        .setDesc(
+          "Enter the OAuth client_secret (required for confidential applications)",
+        )
+        .addText((component) => {
+          component.inputEl.type = "password";
+          component
+            .setValue(instance.clientSecret || "")
+            .setPlaceholder("Leave empty for public access")
+            .onChange(async (value) => {
+              instance.clientSecret = value.trim() || undefined;
               await this.plugin.saveSettings();
               this.plugin.reloadClients();
             });

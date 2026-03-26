@@ -16,13 +16,19 @@ class AuthService {
   private app: App;
   private baseUrl: string;
   private clientId: string;
+  private clientSecret: string | undefined;
   private secretStorage: SecretStorage;
 
-  constructor(plugin: Plugin, baseUrl: string, clientId: string) {
-    console.debug("Auth Service", baseUrl);
+  constructor(
+    plugin: Plugin,
+    baseUrl: string,
+    clientId: string,
+    clientSecret?: string,
+  ) {
     this.app = plugin.app;
     this.baseUrl = baseUrl;
     this.clientId = clientId;
+    this.clientSecret = clientSecret;
     this.secretStorage = this.app.secretStorage;
   }
 
@@ -104,6 +110,9 @@ class AuthService {
     url.searchParams.set("grant_type", "authorization_code");
     url.searchParams.set("redirect_uri", "obsidian://gitlab-embeds");
     url.searchParams.set("code_verifier", codeVerifier);
+    if (this.clientSecret) {
+      url.searchParams.set("client_secret", this.clientSecret);
+    }
 
     const response = await requestUrl({
       url: url.toString(),
@@ -160,6 +169,9 @@ class AuthService {
     url.searchParams.set("refresh_token", refreshToken);
     url.searchParams.set("grant_type", "refresh_token");
     url.searchParams.set("redirect_uri", "obsidian://gitlab-embeds");
+    if (this.clientSecret) {
+      url.searchParams.set("client_secret", this.clientSecret);
+    }
 
     const response = await requestUrl({
       url: url.toString(),

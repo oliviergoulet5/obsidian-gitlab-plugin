@@ -5,6 +5,7 @@ type GitLabAPIClientOptions = {
   baseURL: string;
   plugin: Plugin;
   clientId?: string;
+  clientSecret?: string;
 };
 
 export class GitLabAPIClient {
@@ -14,12 +15,12 @@ export class GitLabAPIClient {
   constructor(options: GitLabAPIClientOptions) {
     this.baseURL = options.baseURL + "/api";
 
-    console.debug(options);
     if (options.clientId) {
       this.authService = new AuthService(
         options.plugin,
         options.baseURL,
         options.clientId,
+        options.clientSecret,
       );
     }
   }

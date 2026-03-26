@@ -26,7 +26,6 @@ export default class GitLabPlugin extends Plugin {
   clients: GitLabAPIClientRecord = {};
 
   async onload() {
-    console.debug("onload");
     await this.loadSettings();
     this.addSettingTab(new GitLabSettingTab(this.app, this));
     this.reloadClients();
@@ -35,7 +34,6 @@ export default class GitLabPlugin extends Plugin {
     this.registerObsidianProtocolHandler("gitlab-embeds", async (data) => {
       const code = data.code as string;
       const state = data.state as string;
-      console.debug("OAuth callback", code, state);
 
       // Find the instance that initiated this - for now assume first instance with clientId
       const instance = this.settings.instances.find((i) => i.clientId);
@@ -43,7 +41,6 @@ export default class GitLabPlugin extends Plugin {
       const client = baseUrl ? this.clients[baseUrl] : undefined;
       if (client && code && state) {
         await client.handleCallback(code, state);
-        console.debug("OAuth success");
       }
     });
 
@@ -80,6 +77,7 @@ export default class GitLabPlugin extends Plugin {
           baseURL: instance.baseUrl,
           plugin: this,
           clientId: instance.clientId,
+          clientSecret: instance.clientSecret,
         })),
     );
   }

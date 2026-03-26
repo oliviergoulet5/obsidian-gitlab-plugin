@@ -30,4 +30,9 @@ export default tseslint.config(
     "main.js",
   ]),
   eslintPluginPrettierRecommended,
+  {
+    rules: {
+      "obsidianmd/ui/sentence-case": "off",
+    },
+  },
 );
