@@ -50,6 +50,13 @@ export class GitLabAPIClient {
     return await this.authService.isAuthenticated();
   }
 
+  async logout(): Promise<void> {
+    if (!this.authService) {
+      throw new Error("clientId not configured");
+    }
+    await this.authService.logout();
+  }
+
   /**
    * Get a single project issue.
    *

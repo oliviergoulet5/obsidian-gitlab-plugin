@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Modal, Notice, PluginSettingTab, Setting } from "obsidian";
 import GitLabPlugin from "./main";
 
 export interface GitLabInstance {
@@ -14,6 +14,39 @@ export interface GitLabPluginSettings {
 export const DEFAULT_SETTINGS: GitLabPluginSettings = {
   instances: [{ baseUrl: "https://gitlab.com" }],
 };
+
+class LogoutConfirmModal extends Modal {
+  private onConfirm: () => void;
+
+  constructor(app: App, onConfirm: () => void) {
+    super(app);
+    this.onConfirm = onConfirm;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.setText("Are you sure you want to log out?");
+
+    new Setting(contentEl)
+      .addButton((btn) =>
+        btn.setButtonText("Cancel").onClick(() => this.close()),
+      )
+      .addButton((btn) =>
+        btn
+          .setButtonText("Logout")
+          .setCta()
+          .onClick(() => {
+            this.close();
+            this.onConfirm();
+          }),
+      );
+  }
+
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+}
 
 export class GitLabSettingTab extends PluginSettingTab {
   plugin: GitLabPlugin;
@@ -68,6 +101,9 @@ export class GitLabSettingTab extends PluginSettingTab {
     this.plugin.settings.instances.forEach((instance) => {
       const client = this.plugin.clients[instance.baseUrl];
 
+      let previousClientId = instance.clientId;
+      let previousClientSecret = instance.clientSecret;
+
       new Setting(containerEl)
         .setName(`Client ID: ${instance.baseUrl}`)
         .setDesc(
@@ -78,9 +114,19 @@ export class GitLabSettingTab extends PluginSettingTab {
             .setValue(instance.clientId || "")
             .setPlaceholder("Optional - leave empty for public access")
             .onChange(async (value) => {
-              instance.clientId = value.trim() || undefined;
+              const newClientId = value.trim() || undefined;
+              const credentialsChanged =
+                newClientId !== previousClientId ||
+                instance.clientSecret !== previousClientSecret;
+
+              instance.clientId = newClientId;
+              previousClientId = newClientId;
               await this.plugin.saveSettings();
               this.plugin.reloadClients();
+
+              if (credentialsChanged && previousClientId && client) {
+                await client.logout();
+              }
             });
         });
 
@@ -115,23 +161,44 @@ export class GitLabSettingTab extends PluginSettingTab {
             .setValue(instance.clientSecret || "")
             .setPlaceholder("Leave empty for public access")
             .onChange(async (value) => {
-              instance.clientSecret = value.trim() || undefined;
+              const newClientSecret = value.trim() || undefined;
+              const credentialsChanged =
+                instance.clientId !== previousClientId ||
+                newClientSecret !== previousClientSecret;
+
+              instance.clientSecret = newClientSecret;
+              previousClientSecret = newClientSecret;
               await this.plugin.saveSettings();
               this.plugin.reloadClients();
+
+              if (credentialsChanged && instance.clientId && client) {
+                await client.logout();
+              }
             });
         });
 
       if (instance.clientId && client) {
         new Setting(containerEl)
           .setName(`Authorize: ${instance.baseUrl}`)
-          .setDesc(
-            "Click to authorize the plugin to access your GitLab account.",
-          )
-          .addButton((component) =>
-            component.setButtonText("Authorize").onClick(async () => {
-              await client.authorize();
-            }),
-          );
+          .setDesc("Authorize the plugin to access your GitLab account.")
+          .addButton(async (component) => {
+            const isAuth = await client.isAuthenticated();
+            if (isAuth) {
+              component.setButtonText("Logout").onClick(() => {
+                new LogoutConfirmModal(this.app, () => {
+                  void (async () => {
+                    await client.logout();
+                    new Notice("Logged out successfully");
+                    this.display();
+                  })();
+                }).open();
+              });
+            } else {
+              component.setButtonText("Authorize").onClick(() => {
+                void client.authorize();
+              });
+            }
+          });
       }
     });
   }

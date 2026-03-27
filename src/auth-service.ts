@@ -61,6 +61,7 @@ class AuthService {
   async init(): Promise<void> {
     const key = this.getStorageKey("auth");
     const existing = this.secretStorage.getSecret(key);
+
     if (!existing) {
       const data: InstanceAuthData = {
         codeVerifier: this.generateRandom(),
@@ -197,6 +198,41 @@ class AuthService {
   async isAuthenticated(): Promise<boolean> {
     const token = await this.getValidToken();
     return token !== null;
+  }
+
+  async logout(): Promise<void> {
+    const tokenKey = this.getStorageKey("tokens");
+
+    const tokensStr = this.secretStorage.getSecret(tokenKey);
+    if (tokensStr) {
+      const tokens = JSON.parse(tokensStr) as StoredTokens;
+      if (tokens.accessToken) {
+        await this.revokeToken(tokens.accessToken);
+      }
+      if (tokens.refreshToken) {
+        await this.revokeToken(tokens.refreshToken);
+      }
+    }
+
+    this.secretStorage.setSecret(tokenKey, "");
+  }
+
+  private async revokeToken(token: string): Promise<void> {
+    const url = new URL(`${this.baseUrl}/oauth/token/revoke`);
+    url.searchParams.set("token", token);
+    if (this.clientSecret) {
+      url.searchParams.set("client_id", this.clientId);
+      url.searchParams.set("client_secret", this.clientSecret);
+    }
+
+    try {
+      await requestUrl({
+        url: url.toString(),
+        method: "POST",
+      });
+    } catch {
+      // Ignore revocation errors - we still want to clear local state
+    }
   }
 }
 
