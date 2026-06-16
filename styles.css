@@ -8,6 +8,11 @@
   border: 1px solid var(--background-modifier-border);
 }
 
+.gitlab-embed-loading {
+  color: var(--text-faint);
+  font-size: var(--font-ui-small);
+}
+
 .gitlab-embed,
 .gitlab-embed:hover,
 .gitlab-embed:active {
@@ -77,4 +82,194 @@
   background-color: #444;
   color: white;
   font-size: var(--font-smallest);
+}
+
+.gitlab-embed-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--size-4-4);
+}
+
+.gitlab-embed-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.gitlab-embed-aside {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--size-4-3);
+  max-width: 40%;
+}
+
+.gitlab-status-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--size-4-1);
+  text-align: right;
+  max-width: 100%;
+}
+
+.gitlab-status-block-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--size-4-1);
+}
+
+.gitlab-status-block-emoji {
+  font-size: var(--font-ui-medium);
+  line-height: 1;
+}
+
+.gitlab-status-block-label {
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-medium);
+  color: var(--text-normal);
+  line-height: 1;
+}
+
+.gitlab-status-block-meta {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  text-align: right;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.gitlab-status-block--merged .gitlab-status-block-label {
+  color: var(--color-green);
+}
+
+.gitlab-status-block--opened .gitlab-status-block-label {
+  color: var(--color-blue);
+}
+
+.gitlab-status-block--closed .gitlab-status-block-label,
+.gitlab-status-block--locked .gitlab-status-block-label {
+  color: var(--text-muted);
+}
+
+.gitlab-status-block--success .gitlab-status-block-label {
+  color: var(--color-green);
+}
+
+.gitlab-status-block--failed .gitlab-status-block-label {
+  color: var(--color-red);
+}
+
+.gitlab-status-block--running .gitlab-status-block-label,
+.gitlab-status-block--pending .gitlab-status-block-label {
+  color: var(--color-blue);
+}
+
+.gitlab-status-block--canceled .gitlab-status-block-label,
+.gitlab-status-block--cancelled .gitlab-status-block-label,
+.gitlab-status-block--skipped .gitlab-status-block-label {
+  color: var(--text-muted);
+}
+
+.gitlab-mr-discuss-block {
+  display: block;
+}
+
+.gitlab-mr-discuss-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--size-4-4);
+  margin-bottom: var(--size-4-3);
+  padding-bottom: var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.gitlab-mr-discuss-header-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.gitlab-mr-discuss-header-aside {
+  flex-shrink: 0;
+}
+
+.gitlab-mr-discuss-summary {
+  color: var(--text-faint);
+  font-size: var(--font-ui-small);
+  margin-bottom: var(--size-4-2);
+}
+
+.gitlab-mr-discuss-empty {
+  color: var(--text-faint);
+  font-size: var(--font-ui-small);
+  padding: var(--size-4-2) 0;
+}
+
+.gitlab-mr-discuss-threads {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-3);
+}
+
+.gitlab-mr-discuss-thread {
+  padding: var(--size-4-2);
+  border-radius: var(--radius-s);
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+}
+
+.gitlab-mr-discuss-thread-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+  align-items: center;
+  margin-bottom: var(--size-4-2);
+}
+
+.gitlab-mr-discuss-position {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+}
+
+.gitlab-mr-discuss-resolved {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  border-radius: 9999px;
+  padding: var(--size-4-1) var(--size-4-2);
+  background-color: var(--background-modifier-border);
+}
+
+.gitlab-mr-discuss-note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-1);
+}
+
+.gitlab-mr-discuss-note + .gitlab-mr-discuss-note {
+  margin-top: var(--size-4-2);
+}
+
+.gitlab-mr-discuss-reply {
+  margin-left: var(--size-4-4);
+  padding-left: var(--size-4-3);
+  border-left: 2px solid var(--background-modifier-border);
+}
+
+.gitlab-mr-discuss-note-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-3);
+  align-items: center;
+}
+
+.gitlab-mr-discuss-body {
+  font-size: var(--font-ui-small);
+  white-space: pre-wrap;
+  word-break: break-word;
 }

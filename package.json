@@ -7,6 +7,7 @@
     "version": "node version-bump.mjs && git add manifest.json versions.json",
     "dev": "node esbuild.config.mjs",
     "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
+    "link:vault": "bash scripts/link-vault.sh",
     "lint": "eslint .",
     "lint-staged": "lint-staged",
     "prepare": "husky"
